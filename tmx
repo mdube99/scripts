@@ -1,0 +1,11 @@
+#!/bin/bash
+# Use -d to allow the rest of the function to run
+# -d to prevent current window from changing
+# tmux new-window -n Terminal
+tmux new-window -d -n Neovim
+tmux new-window -d -n Other
+tmux new-window -d -n Dotfiles
+# -d to detach any other client (which there shouldn't be,
+# since you just created the session).
+tmux attach-session -d -t Main
+clear
