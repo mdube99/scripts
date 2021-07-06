@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Set Session Name
+SESSION="Notes"
+SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
+
+# Only create tmux session if it doesn't already exist
+if [ "$SESSIONEXISTS" = "" ]
+then
+    # Start New Session with our name
+    tmux new-session -d -s $SESSION
+
+    # Name first Pane and start zsh
+    tmux rename-window -t 1 'Notes'
+    tmux send-keys -t 'Notes' "nvim" C-m
+
+    # setup Neovim window
+    tmux new-window -t $SESSION:2 -n 'Vimwiki'
+    tmux send-keys -t 'Vimwiki' "cd ~/vimwiki" C-m
+    tmux send-keys -t 'Vimwiki' "vim index.md" C-m
+
+    # setup terminal window
+    tmux new-window -t $SESSION:3 -n 'Terminal'
+    tmux send-keys -t 'Terminal'
+
+fi
+
+# Attach Session, on the Main window
+tmux attach-session -t $SESSION:1
