@@ -1,11 +1,31 @@
 #!/bin/bash
-# Use -d to allow the rest of the function to run
-# -d to prevent current window from changing
-# tmux new-window -n Terminal
-tmux new-window -d -n Neovim
-tmux new-window -d -n Other
-tmux new-window -d -n Dotfiles
-# -d to detach any other client (which there shouldn't be,
-# since you just created the session).
-tmux attach-session -d -t Main
-clear
+
+# Set Session Name
+SESSION="Main"
+SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
+
+# Only create tmux session if it doesn't already exist
+if [ "$SESSIONEXISTS" = "" ]
+then
+    # Start New Session with our name
+    tmux new-session -d -s $SESSION
+
+    # Name first Pane and start zsh
+    tmux rename-window -t 1 'Terminal'
+    tmux send-keys -t 'Terminal' C-m
+
+    # setup Neovim window
+    tmux new-window -t $SESSION:2 -n 'Neovim'
+    tmux send-keys -t 'Neovim' "nvim" C-m
+
+    # setup Neovim window
+    tmux new-window -t $SESSION:3 -n 'Other'
+    # tmux send-keys -t 'Neovim' "nvim" C-m
+
+    # Setup an additional shell
+    tmux new-window -t $SESSION:4 -n 'Dotfiles'
+    tmux send-keys -t 'Dotfiles' "cd ~/dotfiles" C-m "clear" C-m
+fi
+
+# Attach Session, on the Main window
+tmux attach-session -t $SESSION:1
