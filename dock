@@ -8,18 +8,18 @@ STATE=`xinput list-props $KEY | grep 'Device Enabled' | awk '{print $4}'`
 if [[ $STATE -eq 1 ]]; then
     echo "Docking laptop"
     # sets monitor stuff up for main monitor
-    bash ~/dotfiles/i3/scripts/main_with_dock.sh
-    sleep 0.5
+    bash ~/dotfiles/i3/scripts/main_dock.sh
+    sleep 0.2
     # launches polybar config to get bar for every monitor
     bash ~/dotfiles/polybar/launch.sh &
-    sleep 0.5
+    sleep 0.2
     i3-msg restart
 else
     echo "Undocking laptop"
-    bash ~/dotfiles/i3/scripts/main_without_dock.sh
-    sleep 0.5
+    bash ~/dotfiles/i3/scripts/main_no_dock.sh
+    sleep 0.2
     # relaunches polybar config
     bash ~/dotfiles/polybar/launch.sh &
-    sleep 0.5
+    sleep 0.2
     i3-msg restart
 fi
