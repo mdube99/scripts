@@ -16,7 +16,7 @@ then
 
     # setup Neovim window
     tmux new-window -t $SESSION:2 -n 'Neovim'
-    tmux send-keys -t 'Neovim' "nvim" C-m
+    tmux send-keys -t 'Neovim' "lvim" C-m
 
     # setup other  window
     tmux new-window -t $SESSION:3 -n 'Other'
