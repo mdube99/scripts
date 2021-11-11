@@ -1,25 +1,43 @@
 #!/usr/bin/env bash
 
+# sleep 5
+
 declare -i KEY
 KEY=`xinput list | grep -Eio 'Caldigit, Inc.*.id\=[0-9]{1,2}' | grep -Eo '[0-9]{2}'`
 declare -i STATE
 STATE=`xinput list-props $KEY | grep 'Device Enabled' | awk '{print $4}'`
 
+MONITOR=$1
+
 if [[ $STATE -eq 1 ]]; then
-    echo "Docking laptop"
-    # sets monitor stuff up for main monitor
-    bash ~/dotfiles/i3/scripts/main_dock.sh
-    sleep 0.2
-    # launches polybar config to get bar for every monitor
-    bash ~/dotfiles/polybar/launch.sh &
-    sleep 0.2
-    i3-msg restart
+    if [[ $MONITOR = "--portrait" ]]; then
+        echo "Docking laptop Portrait"
+        # sets monitor stuff up for main monitor
+        bash ~/dotfiles/i3/scripts/main_dock.sh
+        sleep 0.2
+        # launches polybar config to get bar for every monitor
+        bash ~/dotfiles/polybar/launch.sh &
+        sleep 0.2
+        i3-msg restart
+    else
+        echo "Docking laptop - normal"
+        # sets monitor stuff up for main monitor
+        bash ~/dotfiles/i3/scripts/docked_non_portrait.sh
+        sleep 0.2
+        # launches polybar config to get bar for every monitor
+        bash ~/dotfiles/polybar/launch.sh &
+        sleep 0.2
+        i3-msg restart
+    fi
 else
-    echo "Undocking laptop"
-    bash ~/dotfiles/i3/scripts/main_no_dock.sh
-    sleep 0.2
-    # relaunches polybar config
-    bash ~/dotfiles/polybar/launch.sh &
-    sleep 0.2
-    i3-msg restart
+        echo "Undocking laptop"
+        bash ~/dotfiles/i3/scripts/main_no_dock.sh
+        sleep 0.2
+        # relaunches polybar config
+        bash ~/dotfiles/polybar/launch.sh &
+        sleep 0.2
+        i3-msg restart
 fi
+
+# changes workspace as it usually defaults to workspace 11 for some reason
+i3-msg workspace "1"
