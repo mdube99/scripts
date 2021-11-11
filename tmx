@@ -22,11 +22,8 @@ then
     tmux new-window -t $SESSION:3 -n 'Other'
     # tmux send-keys -t 'Neovim' "nvim" C-m
 
-    # setup ssh window
-    tmux new-window -t $SESSION:4 -n 'SSH'
-
     # Setup an additional shell
-    tmux new-window -t $SESSION:5 -n 'Dotfiles'
+    tmux new-window -t $SESSION:4 -n 'Dotfiles'
     tmux send-keys -t 'Dotfiles' "cd ~/dotfiles" C-m "clear" C-m
 fi
 
