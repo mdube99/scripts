@@ -1,0 +1,14 @@
+#!/bin/bash
+
+listOfItems=($(/usr/bin/ls $HOME/Pictures/Backgrounds | tr " " "\n"))
+
+
+choice=$(printf '%s\n' "${listOfItems[@]}" | dmenu -i -l 20 -p 'Background:')
+
+if [[ "$choice" == quit ]]; then
+    exit 1
+elif [[ "$choice" ]]; then 
+    cfg=$(printf '%s\n' "${choice}" | awk '{print $NF}')
+    feh --bg-center $HOME/Pictures/Backgrounds/"$cfg"
+    sed -i '/BG=/s/".*"/"'$cfg'"/' $HOME/.dwm/autostart
+fi
