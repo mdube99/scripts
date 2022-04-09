@@ -1,0 +1,35 @@
+#!/bin/bash
+# WIP script from TCM-Security PEH course
+
+url=$1
+
+# Checking if folder exists, and creating it if not 
+# This is saying, if NOT directory,
+if [ ! -d "$url" ];then
+    mkdir $url
+fi
+
+if [ ! -d "$url/recon" ];then
+    mkdir $url/recon
+fi
+
+echo "[+] Harvesting subdomains with Assetfinder"
+assetfinder $url >> $url/recon/init_assets.txt
+
+# Only showing what we want (within scope basically), since sometimes assetfinder will show additional assets
+cat $url/recon/init_assets.txt | grep $1 >> $url/recon/assets_final.txt
+
+# Takes a lot of time, but finds a LOT more than what Assetfinder will find.
+
+# echo "[+] Harvesting subdomains with Amass"
+# amass enum -d $url >> $url/recon/f.txt
+# sort -u $url/recon/f.txt >> $url/recon/final.txt
+# rm $url/recon/f.txt
+
+echo "[+] Probing for alive domains"
+
+cat $url/recon/assets_final.txt | sort -u | httprobe -s -p https:443 | sed 's/https\?:\/\///' | tr -d ':443' >> $url/recon/alive.txt
+
+echo "[+] Screenshotting Active web pages"
+
+
