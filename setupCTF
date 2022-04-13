@@ -6,11 +6,23 @@ printf "\n"
 
 echo "CTF: $CTFname"
 
-# Create folders for CTF
-mkdir $HOME/CTF/"$CTFname"
-mkdir $HOME/CTF/"$CTFname/nmap"
-mkdir $HOME/CTF/"$CTFname/users"
-mkdir $HOME/CTF/"$CTFname/passwords"
+# Create folders for CTF if they don't already exist - useful if restarting CTF from earlier
+if [ ! -d "$HOME/CTF/$CTFname" ];then
+     mkdir $HOME/CTF/"$CTFname"
+fi
+
+if [ ! -d "$HOME/CTF/$CTFname/nmap" ];then
+     mkdir $HOME/CTF/"$CTFname/nmap"
+fi
+
+if [ ! -d "$HOME/CTF/$CTFname/users" ];then
+     mkdir $HOME/CTF/"$CTFname/users"
+fi
+
+if [ ! -d "$HOME/CTF/$CTFname/passwords" ];then
+    mkdir $HOME/CTF/"$CTFname/passwords"
+fi
+
 
 # Create readme file
 touch $HOME/CTF/"$CTFname/README.md"
@@ -27,3 +39,28 @@ sed -i '/IP=/s/".*"/"'$IPaddr'"/' $HOME/dotfiles/zsh/conf/exports.zsh
 
 # Restart zsh to have the env var of $IP without having a nested session
 exec zsh
+
+# Starting on setting up Tmux panels
+# Only create tmux session if it doesn't already exist
+if [ "$SESSIONEXISTS" = "" ]
+then
+    # Start New Session with our name
+    tmux new-session -d -s $SESSION
+
+    # Name first Pane and start zsh
+    tmux rename-window -t 1 'OpenVPN'
+    tmux send-keys -t 'OpenVPN' C-m
+
+    # setup Main window
+    tmux new-window -t $SESSION:2 -n 'Main'
+    tmux send-keys -t 'Main' "lvim" C-m
+
+    # setup other  window
+    tmux new-window -t $SESSION:3 -n 'Misc'
+    # tmux send-keys -t 'Neovim' "nvim" C-m
+fi
+
+# Attach Session, on the Main window
+tmux attach-session -t $SESSION:1
+
+echo $IP
