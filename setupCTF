@@ -1,8 +1,12 @@
 #!/bin/bash
 
-printf "\n"
-read -p "Please enter name of CTF: " CTFname
-printf "\n"
+if [ -z $1 ];then
+    printf "\n"
+    read -p "Please enter name of CTF: " CTFname
+    printf "\n"
+else
+    CTFname=$1
+fi
 
 echo "CTF: $CTFname"
 
