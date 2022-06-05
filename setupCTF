@@ -1,14 +1,29 @@
 #!/bin/bash
 
+# Declare colors
+yellow="\e[33;1m"
+bg="\e[35;1m"
+green="\e[32;1m"
+blue="\e[34;1m"
+red="\e[31;1m"
+ec="\e[0m"
+
+#Banner
+echo "========================================================================================="
+figlet -t -S "setupCTF"
+echo "========================================================================================="
+
 if [ -z $1 ];then
     printf "\n"
-    read -p "Please enter name of CTF: " CTFname
+    read -p "[+] Please enter name of CTF: " CTFname
     printf "\n"
 else
     CTFname=$1
 fi
 
-echo "CTF: $CTFname"
+
+# Replacing spaces in CTFName with an underscore for folder naming scheme
+CTFname=$(sed 's/ /_/g' <<< "$CTFname")
 
 # Create folders for CTF if they don't already exist - useful if restarting CTF from earlier
 if [ ! -d "$HOME/CTF/$CTFname" ];then
@@ -20,7 +35,7 @@ fi
 
 # Create readme file
 touch $HOME/CTF/"$CTFname/README.md"
-echo "# $CTFname" >> "$HOME/CTF/$CTFname/README.md"
+echo "[+] $CTFname" >> "$HOME/CTF/$CTFname/README.md"
 
 # Get IP address and append it into readme
 read -p "IP Address: " IPaddr
@@ -31,30 +46,53 @@ echo -e "\n"'```bash\n'EXPORT IP=$IPaddr'\n```' >> "$HOME/CTF/$CTFname/README.md
 # Replace $IP with proper IP address given
 sed -i '/IP=/s/".*"/"'$IPaddr'"/' $HOME/dotfiles/zsh/conf/exports.zsh
 
-# Restart zsh to have the env var of $IP without having a nested session
-exec zsh
+
+
+# Create TMUX session if wanted
+while true; do
+
+    read -p "[+] Would you like to setup a TMUX session? [Y/N]: " tmxans
+
+    case $tmxans in 
+        [yY] ) echo -e "[+] Creating TMUX session";
 
 # Starting on setting up Tmux panels
 # Only create tmux session if it doesn't already exist
-if [ "$SESSIONEXISTS" = "" ]
-then
-    # Start New Session with our name
-    tmux new-session -d -s $SESSION
+            SESSION="CTF"
+            SESSIONEXISTS=$(tmux list-sessions | grep $SESSION)
 
-    # Name first Pane and start zsh
-    tmux rename-window -t 1 'OpenVPN'
-    tmux send-keys -t 'OpenVPN' C-m
+            if [ "$SESSIONEXISTS" = "" ]
+            then
+                # Start New Session with our name
+                tmux new-session -d -s $SESSION
 
-    # setup Main window
-    tmux new-window -t $SESSION:2 -n 'Main'
-    tmux send-keys -t 'Main' "lvim" C-m
+                # Name first Pane and start zsh
+                tmux rename-window -t 1 'OpenVPN'
+                tmux send-keys -t 'OpenVPN' C-m
 
-    # setup other  window
-    tmux new-window -t $SESSION:3 -n 'Misc'
-    # tmux send-keys -t 'Neovim' "nvim" C-m
-fi
+                # setup CTF window
+                tmux new-window -t $SESSION:2 -n 'Main'
+                # tmux send-keys -t 'CTF' "lvim" C-m
 
-# Attach Session, on the Main window
-tmux attach-session -t $SESSION:1
+                # setup other  window
+                tmux new-window -t $SESSION:3 -n 'Metasploit'
+                # tmux send-keys -t 'Neovim' "nvim" C-m
+            fi
 
-echo $IP
+            # Attach Session, on the CTF window
+            tmux attach-session -t $SESSION:1
+            sleep 1
+
+            break;;
+        [nN] ) echo "[+] Continuing without creating TMUX session";
+            sleep 1
+            break;;
+        * ) echo -e "${red} [+] Invalid response, please input either Y or N.\n${ec}";;
+    esac
+
+done
+
+echo -e "[+] IP Address for $CTFname: ${red}$IPaddr"
+
+# Restart zsh to have the env var of $IP without having a nested session
+exec zsh
