@@ -1,0 +1,9 @@
+#!/bin/bash
+
+timestamp=$(date +%c)
+
+cp "$HOME/notes/💡resources/Templates/Main Note Template.md" ".tempNote.md"
+nvim -c "call CreateNotes()"
+
+# echo $1 >> "$filename.md"
+mv ".tempNote.md" "$HOME/notes/🧹 Areas/📭 Thoughts/$timestamp.md"
