@@ -9,6 +9,7 @@ if [[ "$choice" == quit ]]; then
     exit 1
 elif [[ "$choice" ]]; then 
     cfg=$(printf '%s\n' "${choice}" | awk '{print $NF}')
+    dunstify -a center -u normal -i "$1" "Changing wallpaper..."
     feh --bg-center $HOME/Pictures/Backgrounds/"$cfg"
     sed -i '/BG=/s/".*"/"'$cfg'"/' $HOME/.dwm/autostart
 fi
