@@ -486,20 +486,6 @@ vulnsScan() {
                         echo
                 fi
 
-                # Ensure the ProxyNotShell (CVE-2022-40140 & CVE-2022-41082) is available, then run it with nmap
-                if [ ! -f /usr/share/nmap/scripts/vulners.nse ]; then
-                        printf "${RED}Please install 'vulners.nse' nmap script:\n"
-                        printf "${RED}https://github.com/CronUp/Vulnerabilidades/blob/main/proxynotshell_checker.nse\n"
-                        printf "${RED}\n"
-                        printf "${RED}Skipping ProxyNotShell scan!\n"
-                        printf "${NC}\n"
-                else
-                        printf "${YELLOW}Running ProxyNotShell on ${portType} ports\n"
-                        printf "${NC}\n"
-                        nmapProgressBar "${nmapType} -sV --script proxynotshell_checker.nse -p 443 -oN nmap/proxynotshell_${HOST}.nmap ${HOST} ${DNSSTRING}" 3
-                        echo
-
-
                 # Nmap vulnerability detection script scan
                 echo
                 printf "${YELLOW}Running Vuln scan on ${portType} ports\n"
