@@ -1,0 +1,6 @@
+#!/bin/bash
+
+FILENAME=${1?Specifiy a filename, Dumbass}
+
+cat $FILENAME
+xclip -sel clip < $FILENAME
