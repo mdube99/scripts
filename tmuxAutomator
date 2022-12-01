@@ -6,8 +6,6 @@ COUNTER=1
 if [ -z "$TMUX" ]; then
   echo "open tmux, dumbass"
   exit 1
-else
-  ta ~/clients
 fi
 
 if [[ -n "$TMUX_PANE" ]]; then
