@@ -11,5 +11,5 @@ elif [[ "$choice" ]]; then
     cfg=$(printf '%s\n' "${choice}" | awk '{print $NF}')
     dunstify -a center -u normal -i "$1" "Changing wallpaper..."
     feh --bg-center $HOME/Pictures/Backgrounds/"$cfg"
-    sed -i '/BG=/s/".*"/"'$cfg'"/' $HOME/.dwm/autostart
+    sed -i '/BG=/s/".*"/"'$cfg'"/' $HOME/.dwm/autostart.sh
 fi
