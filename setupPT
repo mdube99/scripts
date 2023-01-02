@@ -1,0 +1,42 @@
+#!/bin/bash
+
+setup(){
+    echo "Setup Penetration Test"
+
+    printf "\n"
+    read -p "[+] IPT or EPT: " PTtype
+    printf "\n"
+
+    read -p "[+] Client name: " PTclient
+    read -p "[+] Service in dovico: " PTservice
+
+    PTname="${PTtype}_${PTclient}_${PTservice}"
+    echo $PTname
+
+    # Create folders for CTF if they don't already exist
+    if [ ! -d "$HOME/clients/$PTname" ]; then
+        mkdir -p $HOME/clients/"$PTname"
+        mkdir -p $HOME/clients/"$PTname"
+        mkdir -p $HOME/clients/"$PTname"
+        mkdir -p $HOME/clients/"$PTname"
+    fi
+
+    if [ "$PTtype" = "IPT" ] || [ "$PTtype" = "ipt" ]; then
+        IPT
+    else 
+        exit
+    fi 
+}
+
+IPT(){
+    # Get IP address and append it into readme
+    read -p "RNA IP: " RNAIP
+
+    # Replace $IP with proper RNA IP
+    sed -i '/IP=/s/".*"/"'$RNAIP'"/' $HOME/.config/zsh/exports.zsh
+
+    echo -e "[+] IP Address for $PTname: ${red}$RNAIP"
+}
+
+# Restart zsh to have the env var of $IP without having a nested session
+exec zsh
