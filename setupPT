@@ -8,6 +8,7 @@ setup(){
     printf "\n"
 
     read -p "[+] Client name: " PTclient
+    PTclient=$(sed 's/ /_/g' <<< "$PTclient")
     read -p "[+] Service in dovico: " PTservice
 
     PTname="${PTtype}_${PTclient}_${PTservice}"
@@ -25,6 +26,8 @@ setup(){
         IPT
     else 
         exit
+        # Restart zsh to have the env var of $IP without having a nested session
+        exec zsh
     fi 
 }
 
@@ -36,7 +39,8 @@ IPT(){
     sed -i '/IP=/s/".*"/"'$RNAIP'"/' $HOME/.config/zsh/exports.zsh
 
     echo -e "[+] IP Address for $PTname: ${red}$RNAIP"
+    # Restart zsh to have the env var of $IP without having a nested session
+    exec zsh
 }
 
-# Restart zsh to have the env var of $IP without having a nested session
-exec zsh
+setup
