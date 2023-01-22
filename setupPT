@@ -9,18 +9,13 @@ setup(){
 
     read -p "[+] Client name: " PTclient
     PTclient=$(sed 's/ /_/g' <<< "$PTclient")
-    read -p "[+] Service in dovico: " PTservice
+    read -p "[+] Service: " PTservice
 
     PTname="${PTtype}_${PTclient}_${PTservice}"
     echo $PTname
 
-    # Create folders for CTF if they don't already exist
-    if [ ! -d "$HOME/clients/$PTname" ]; then
-        mkdir -p $HOME/clients/"$PTname"
-        mkdir -p $HOME/clients/"$PTname"
-        mkdir -p $HOME/clients/"$PTname"
-        mkdir -p $HOME/clients/"$PTname"
-    fi
+    # Create folder for PT
+    mkdir -p $HOME/clients/"$PTname"
 
     if [ "$PTtype" = "IPT" ] || [ "$PTtype" = "ipt" ]; then
         IPT
