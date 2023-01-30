@@ -22,7 +22,8 @@ setup(){
     else 
         exit
         # Restart zsh to have the env var of $IP without having a nested session
-        exec zsh
+        tmux new-session -As $PTname
+
     fi 
 }
 
@@ -35,7 +36,7 @@ IPT(){
 
     echo -e "[+] IP Address for $PTname: ${red}$RNAIP"
     # Restart zsh to have the env var of $IP without having a nested session
-    exec zsh
+    tmux new-session -As $PTname
 }
 
 setup
