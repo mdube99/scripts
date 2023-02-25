@@ -2,10 +2,16 @@
 #by @21y4d
 
 # Define ANSI color variables
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-GREEN='\033[0;32m'
-NC='\033[0m'
+# RED='\033[0;31m'
+# YELLOW='\033[0;33m'
+# GREEN='\033[0;32m'
+# NC='\033[0m'
+# origIFS="${IFS}"
+
+RED=' '
+YELLOW=' '
+GREEN=' '
+NC=' '
 origIFS="${IFS}"
 
 # Start timer
@@ -245,13 +251,14 @@ cmpPorts() {
 # Print nmap progress bar
 # $1 is $scanType, $2 is $percent, $3 is $elapsed, $4 is $remaining
 progressBar() {
-        [ -z "${2##*[!0-9]*}" ] && return 1
-        [ "$(stty size | cut -d ' ' -f 2)" -le 120 ] && width=50 || width=100
-        fill="$(printf "%-$((width == 100 ? $2 : ($2 / 2)))s" "#" | tr ' ' '#')"
-        empty="$(printf "%-$((width - (width == 100 ? $2 : ($2 / 2))))s" " ")"
-        printf "In progress: $1 Scan ($3 elapsed - $4 remaining)   \n"
-        printf "[${fill}>${empty}] $2%% done   \n"
-        printf "\e[2A"
+        # [ -z "${2##*[!0-9]*}" ] && return 1
+        # [ "$(stty size | cut -d ' ' -f 2)" -le 120 ] && width=50 || width=100
+        # fill="$(printf "%-$((width == 100 ? $2 : ($2 / 2)))s" "#" | tr ' ' '#')"
+        # empty="$(printf "%-$((width - (width == 100 ? $2 : ($2 / 2))))s" " ")"
+        # printf "In progress: $1 Scan ($3 elapsed - $4 remaining)   \n"
+        # printf "[${fill}>${empty}] $2%% done   \n"
+        # printf "\e[2A"
+        return 1
 }
 
 # Calculate current progress bar status based on nmap stats (with --stats-every)
@@ -297,7 +304,7 @@ networkScan() {
 
         if ! $REMOTE; then
                 # Discover live hosts with nmap
-                nmapProgressBar "${nmapType} -T4 --max-retries 1 --max-scan-delay 20 -n -sn -oN nmap/Network_${HOST}.nmap ${subnet}/24"
+                "${nmapType} -T4 --max-retries 1 --max-scan-delay 20 -n -sn -oN nmap/Network_${HOST}.nmap ${subnet}/24"
                 printf "${YELLOW}Found the following live hosts:${NC}\n\n"
                 cat nmap/Network_${HOST}.nmap | grep -v '#' | grep "$(echo $subnet | sed 's/..$//')" | awk {'print $5'}
         elif $pingable; then
@@ -326,7 +333,7 @@ portScan() {
         printf "${NC}\n"
 
         if ! $REMOTE; then
-                nmapProgressBar "${nmapType} -T4 --max-retries 1 --max-scan-delay 20 --open -oN nmap/Port_${HOST}.nmap ${HOST} ${DNSSTRING}"
+                ${nmapType} -T4 --max-retries 1 --max-scan-delay 20 --open -oN nmap/Port_${HOST}.nmap ${HOST} ${DNSSTRING}
                 assignPorts "${HOST}"
         else
                 printf "${YELLOW}Port Scan is not implemented yet in Remote mode.\n${NC}"
@@ -346,7 +353,7 @@ scriptScan() {
                 if [ -z "${commonPorts}" ]; then
                         printf "${YELLOW}No ports in port scan.. Skipping!\n"
                 else
-                        nmapProgressBar "${nmapType} -sCV -p${commonPorts} --open -oN nmap/Script_${HOST}.nmap ${HOST} ${DNSSTRING}" 2
+                        ${nmapType} -sCV -p${commonPorts} --open -oN nmap/Script_${HOST}.nmap ${HOST} ${DNSSTRING} 2
                 fi
 
                 # Modify detected OS if Nmap detects a different OS
@@ -375,7 +382,7 @@ fullScan() {
         printf "${NC}\n"
 
         if ! $REMOTE; then
-                nmapProgressBar "${nmapType} -p- --max-retries 1 --max-rate 500 --max-scan-delay 20 -T4 -v --open -oN nmap/Full_${HOST}.nmap ${HOST} ${DNSSTRING}" 3
+                ${nmapType} -p- --max-retries 1 --max-rate 500 --max-scan-delay 20 -T4 -v --open -oN nmap/Full_${HOST}.nmap ${HOST} ${DNSSTRING} 3
                 assignPorts "${HOST}"
 
                 # Nmap version and default script scan on found ports if Script scan was not run yet
@@ -384,7 +391,7 @@ fullScan() {
                         echo
                         printf "${YELLOW}Making a script scan on all ports\n"
                         printf "${NC}\n"
-                        nmapProgressBar "${nmapType} -sCV -p${allPorts} --open -oN nmap/Full_Extra_${HOST}.nmap ${HOST} ${DNSSTRING}" 2
+                        ${nmapType} -sCV -p${allPorts} --open -oN nmap/Full_Extra_${HOST}.nmap ${HOST} ${DNSSTRING} 2
                         assignPorts "${HOST}"
                 # Nmap version and default script scan if any extra ports are found
                 else
@@ -400,7 +407,7 @@ fullScan() {
                                 echo
                                 printf "${YELLOW}Making a script scan on extra ports: $(echo "${extraPorts}" | sed 's/,/, /g')\n"
                                 printf "${NC}\n"
-                                nmapProgressBar "${nmapType} -sCV -p${extraPorts} --open -oN nmap/Full_Extra_${HOST}.nmap ${HOST} ${DNSSTRING}" 2
+                                ${nmapType} -sCV -p${extraPorts} --open -oN nmap/Full_Extra_${HOST}.nmap ${HOST} ${DNSSTRING} 2
                                 assignPorts "${HOST}"
                         fi
                 fi
@@ -426,7 +433,7 @@ UDPScan() {
                         echo
                 fi
 
-                nmapProgressBar "sudo ${nmapType} -sU --max-retries 1 --open --open -oN nmap/UDP_${HOST}.nmap ${HOST} ${DNSSTRING}" 3
+                sudo ${nmapType} -sU --max-retries 1 --open --open -oN nmap/UDP_${HOST}.nmap ${HOST} ${DNSSTRING} 3
                 assignPorts "${HOST}"
 
                 # Nmap version and default script scan on found UDP ports
@@ -437,10 +444,10 @@ UDPScan() {
                         printf "${NC}\n"
                         if [ -f /usr/share/nmap/scripts/vulners.nse ]; then
                                 sudo -v
-                                nmapProgressBar "sudo ${nmapType} -sCVU --script vulners --script-args mincvss=7.0 -p${udpPorts} --open -oN nmap/UDP_Extra_${HOST}.nmap ${HOST} ${DNSSTRING}" 2
+                                sudo ${nmapType} -sCVU --script vulners --script-args mincvss=7.0 -p${udpPorts} --open -oN nmap/UDP_Extra_${HOST}.nmap ${HOST} ${DNSSTRING} 2
                         else
                                 sudo -v
-                                nmapProgressBar "sudo ${nmapType} -sCVU -p${udpPorts} --open -oN nmap/UDP_Extra_${HOST}.nmap ${HOST} ${DNSSTRING}" 2
+                                sudo ${nmapType} -sCVU -p${udpPorts} --open -oN nmap/UDP_Extra_${HOST}.nmap ${HOST} ${DNSSTRING} 2
                         fi
                 else
                         echo
@@ -450,6 +457,15 @@ UDPScan() {
                 fi
         else
                 printf "${YELLOW}UDP Scan is not implemented yet in Remote mode.\n${NC}"
+        fi
+        # isakmp recon        
+        if [ -f "nmap/UDP_Extra_${HOST}.nmap" ] && grep -q "500/udp.*open"
+         "nmap/UDP_Extra_${HOST}.nmap"; then
+             printf "${NC}\n"                
+         printf "${YELLOW}isakmp Recon:\n"
+         printf "${NC}\n"                
+         echo "ikescanit.sh \"${HOST}\" | tee \"recon/ikescan_${HOST}.txt\""                
+         echo        
         fi
 
         echo
@@ -482,7 +498,7 @@ vulnsScan() {
                 else
                         printf "${YELLOW}Running CVE scan on ${portType} ports\n"
                         printf "${NC}\n"
-                        nmapProgressBar "${nmapType} -sV --script vulners --script-args mincvss=7.0 -p${ports} --open -oN nmap/CVEs_${HOST}.nmap ${HOST} ${DNSSTRING}" 3
+                        ${nmapType} -sV --script vulners --script-args mincvss=7.0 -p${ports} --open -oN nmap/CVEs_${HOST}.nmap ${HOST} ${DNSSTRING} 3
                         echo
                 fi
 
@@ -491,7 +507,7 @@ vulnsScan() {
                 printf "${YELLOW}Running Vuln scan on ${portType} ports\n"
                 printf "${YELLOW}This may take a while, depending on the number of detected services..\n"
                 printf "${NC}\n"
-                nmapProgressBar "${nmapType} -sV --script vuln -p${ports} --open -oN nmap/Vulns_${HOST}.nmap ${HOST} ${DNSSTRING}" 3
+                ${nmapType} -sV --script vuln -p${ports} --open -oN nmap/Vulns_${HOST}.nmap ${HOST} ${DNSSTRING} 3
         else
                 printf "${YELLOW}Vulns Scan is not supported in Remote mode.\n${NC}"
         fi
@@ -529,7 +545,7 @@ recon() {
                 availableRecon="$(echo "${allRecon}" | tr "\n" " " | sed 's/\ /,\ /g' | sed 's/..$//')"
         fi
 
-        secs=30
+        secs=0
         count=0
 
         # Ask user for which recon tools to run, default to All if no answer is detected in 30s
@@ -625,9 +641,12 @@ reconRecommend() {
                                         echo "sslscan \"${HOST}\" | tee \"recon/sslscan_${HOST}_${port}.txt\""
                                         echo "nikto -host \"${urlType}${HOST}:${port}\" -ssl | tee \"recon/nikto_${HOST}_${port}.txt\""
                                         echo "$HOST:$PORT | gowitness file --threads 2 -f -"
+                                        echo "nuclei \"${urlType}{$HOST}:${port}\" | tee \"recon/nuclei_${HOST}_${port}\""
                                 else
                                         urlType='http://'
                                         echo "nikto -host \"${urlType}${HOST}:${port}\" | tee \"recon/nikto_${HOST}_${port}.txt\""
+                                        echo "$HOST:$PORT | gowitness file --threads 2 -f -"
+                                        echo "nuclei \"${urlType}{$HOST}:${port}\" | tee \"recon/nuclei_${HOST}_${port}\""
                                 fi
                                 if type ffuf >/dev/null 2>&1; then
                                         extensions="$(echo 'index' >./index && ffuf -s -w ./index:FUZZ -mc '200,302' -e '.asp,.aspx,.html,.jsp,.php' -u "${urlType}${HOST}:${port}/FUZZ" 2>/dev/null | awk -vORS=, -F 'index' '{print $2}' | sed 's/.$//' && rm ./index)"
