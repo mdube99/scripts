@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# Creates various wordlists from enum4linux output
-
-cat $1 | grep "has member: " | cut -d "\\" -f 2 >> ./users/users.txt
-cat $1 | grep -B 1 -A 43 "Password Policy" >> passwordpolicy.txt
-cat $1 | grep "Administrators" | grep "has member: " | cut -d "\\" -f 2 >> ./users/admins.txt
-cat $1 | grep "has member: " | sed 's/\((RID\: [0-9][1-9][0-9]\)) //' >> ./users/GroupsAndUsers.txt
