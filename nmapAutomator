@@ -628,12 +628,12 @@ reconRecommend() {
                                         urlType='https://'
                                         echo "sslscan \"${HOST}\" | tee \"recon/sslscan_${HOST}_${port}.txt\""
                                         echo "nikto -host \"${urlType}${HOST}:${port}\" -ssl | tee \"recon/nikto_${HOST}_${port}.txt\""
-                                        echo "$HOST:$PORT | gowitness file --threads 2 -f -"
+                                        echo "echo $HOST:$PORT | gowitness file --threads 2 -f -"
                                         echo "nuclei \"${urlType}{$HOST}:${port}\" | tee \"recon/nuclei_${HOST}_${port}\""
                                 else
                                         urlType='http://'
                                         echo "nikto -host \"${urlType}${HOST}:${port}\" | tee \"recon/nikto_${HOST}_${port}.txt\""
-                                        echo "$HOST:$PORT | gowitness file --threads 2 -f -"
+                                        echo "echo $HOST:$PORT | gowitness file --threads 2 -f -"
                                         echo "nuclei \"${urlType}{$HOST}:${port}\" | tee \"recon/nuclei_${HOST}_${port}\""
                                 fi
                                 if type ffuf >/dev/null 2>&1; then
